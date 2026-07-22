@@ -1,9 +1,17 @@
 export { Document } from "./document.js";
 export { Section } from "./section.js";
 export { Heading } from "./heading.js";
+export { Text } from "./text.js";
 export { Paragraph } from "./paragraph.js";
 export { List } from "./list.js";
+export { Item } from "./item.js";
 export { Table } from "./table.js";
 export { Image } from "./image.js";
 export { Divider } from "./divider.js";
 export { Columns } from "./columns.js";
+export { PageBreak } from "./page-break.js";
+export { Header } from "./header.js";
+export { Footer } from "./footer.js";
+export { Hyperlink } from "./hyperlink.js";
+export { Quote } from "./quote.js";
+export { CodeBlock } from "./code-block.js";

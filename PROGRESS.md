@@ -1,5 +1,96 @@
 # DocScript — Project Progress
 
+## v0.2 — Language Layer ✅
+
+**Date:** Completed
+**Status:** Done, pushed to GitHub
+
+### What was done
+
+#### 17 Components (all with dual syntax)
+
+| Component | Shorthand | Object | Kind |
+|---|---|---|---|
+| Document | `Document(...children)` | — | `document` |
+| Section | `Section(...children)` | `Section({ id? }, ...children)` | `section` |
+| Heading | `Heading(text, level?)` | `Heading({ text, level?, id? })` | `heading` |
+| Text | `Text(value)` | — | `text` |
+| Paragraph | `Paragraph(text)` | `Paragraph({ id? }, ...children)` | `paragraph` |
+| List | `List(type, ...children)` | `List({ type?, id? }, ...children)` | `list` |
+| Item | `Item(text)` | `Item({ id? }, ...children)` | `item` |
+| Table | `Table(...children)` | `Table({ id? }, ...children)` | `table` |
+| Image | `Image(src, alt?)` | `Image({ src, alt?, id? })` | `image` |
+| Divider | `Divider()` | — | `divider` |
+| Columns | `Columns(...children)` | `Columns({ id? }, ...children)` | `columns` |
+| PageBreak | `PageBreak()` | — | `pageBreak` |
+| Header | `Header(...children)` | `Header({ id? }, ...children)` | `header` |
+| Footer | `Footer(...children)` | `Footer({ id? }, ...children)` | `footer` |
+| Hyperlink | `Hyperlink(text, url)` | `Hyperlink({ text, url, id? })` | `hyperlink` |
+| Quote | `Quote(text, attr?)` | `Quote({ text, attribution?, id? })` | `quote` |
+| CodeBlock | `CodeBlock(code, lang?)` | `CodeBlock({ code, language?, id? })` | `codeBlock` |
+
+#### Visitor API
+
+```ts
+visit(document, {
+  Heading(node) { /* typed */ },
+  Paragraph(node) { /* typed */ },
+  enter(node) { /* before */ },
+  leave(node) { /* after */ },
+});
+```
+
+Depth-first traversal with kind-specific handlers and enter/leave hooks.
+
+#### Enhanced Registry
+
+- `register(kind, factory, meta?)` — with ComponentMeta
+- `getMeta(kind)` — retrieve component metadata
+- `kinds()` — list all registered kinds
+- ComponentMeta includes: kind, version, description, props spec, allowed children
+
+#### 15 Validation Rules
+
+| Rule | Description |
+|---|---|
+| document-must-be-root | Document cannot be child |
+| heading-requires-text | Non-empty text required |
+| invalid-heading-level | Level must be 1-6 |
+| paragraph-requires-children | Must have children |
+| image-requires-src | Non-empty src required |
+| section-requires-children | Must have children |
+| hyperlink-requires-url | Non-empty url required |
+| quote-requires-text | Non-empty text required |
+| codeblock-requires-code | Non-empty code required |
+| list-requires-item-children | Children must be Items |
+| text-requires-value | Non-empty value required |
+| item-requires-children | Must have children |
+| header-only-under-document | Document direct child only |
+| footer-only-under-document | Document direct child only |
+| illegal-parent-child | Hierarchy enforcement |
+
+#### AST Specification
+
+Version bumped to 2. All nodes frozen. Documented hierarchy matrix.
+
+#### Tests: 97 passing
+
+- `tests/components.test.ts` — 58 tests (all 17 components, both syntaxes)
+- `tests/visitor.test.ts` — 7 tests (handlers, enter/leave, depth-first)
+- `tests/validator.test.ts` — 21 tests (all rules, paths, complex doc)
+- `tests/registry.test.ts` — 6 tests (register, meta, kinds)
+- `tests/parser.test.ts` — 5 tests (normalize, parse)
+
+#### Documentation
+
+- `docs/language.md` — Full language specification
+
+#### Examples
+
+- `examples/resume.ts` — Complete resume using only generic components
+
+---
+
 ## v0.1 — Base Project Setup ✅
 
 **Date:** Completed
@@ -21,49 +112,13 @@ docscript/
 └── .github/workflows/
 ```
 
-### @docscript/types
+### Packages
 
-- `DSNode` base interface (kind, version, props, children)
-- 9 node types: Document, Section, Heading, Paragraph, List, Table, Image, Divider, Columns
-- `DS_NODE_VERSION = 1`
-- `DSNodeKind` union type
-- `HeadingLevel`, `ListNodeType` aliases
-- `ValidationError`, `ValidationRule`, `ValidationResult` types
-- `ComponentFactory`, `ComponentRegistry` types
-
-### @docscript/core
-
-- 9 component factory functions (all pure, all frozen/immutable):
-  - `Document(...children)`
-  - `Section(...children)`
-  - `Heading(text, level?)`
-  - `Paragraph(text)`
-  - `List(type, ...children)`
-  - `Table(...children)`
-  - `Image(src, alt?)`
-  - `Divider()`
-  - `Columns(...children)`
-- Component registry (Map-based, register/get/has)
-
-### @docscript/validator
-
-- 5 validation rules:
-  - `document-must-be-root`
-  - `heading-requires-text`
-  - `paragraph-requires-text`
-  - `image-requires-src`
-  - `section-requires-children`
-- Recursive tree traversal with path tracking
-- Custom rule support
-
-### @docscript/parser
-
-- `normalize()` — deep-freezes node tree
-- `parse()` — returns ParseResult with normalized flag
-
-### @docscript/renderer-docx
-
-- Placeholder only, `render()` throws "Renderer not implemented."
+- `@docscript/types` — DSNode, node types, validation types, registry types
+- `@docscript/core` — Component factories, registry, visitor
+- `@docscript/validator` — 15 validation rules, hierarchy enforcement
+- `@docscript/parser` — Normalization, parsing
+- `@docscript/renderer-docx` — Placeholder
 
 ### Tooling
 
@@ -71,129 +126,16 @@ docscript/
 - pnpm 9 workspaces
 - ESLint 9 + typescript-eslint
 - Prettier
-- Vitest (32 tests passing)
+- Vitest
 - Changesets
-- GitHub Actions CI (Node 18/20/22 matrix)
+- GitHub Actions CI (Node 18/20/22)
 - EditorConfig
-- .gitignore
 - MIT License
-
-### Tests (32 passing)
-
-- `tests/components.test.ts` — 16 tests for all 9 components
-- `tests/registry.test.ts` — 3 tests (register, get, duplicate)
-- `tests/validator.test.ts` — 9 tests (valid doc, errors, paths, custom rules)
-- `tests/parser.test.ts` — 4 tests (normalize, parse)
-
-### Examples
-
-- `examples/basic.ts` — demonstrates all components
-
-### GitHub
-
-- Repository: https://github.com/mohamed-shahal/DocScript
-- Branch: main
-- License: MIT
-
----
-
-## v0.2 — Language Design & Component Specification 📋
-
-**Date:** Planned, not started
-**Status:** Plan designed, awaiting implementation
-
-### Planned Changes
-
-#### New Components (17)
-
-**Professional/Resume:**
-- Profile (name, title, summary, email, phone, url, location)
-- Experience (company, role, startDate, endDate, summary, highlights)
-- Education (institution, area, studyType, startDate, endDate)
-- Skills (name, level, keywords)
-- Projects (name, description, url, highlights, keywords)
-- Certification (name, date, issuer, url)
-- Languages (language, fluency)
-- Award (title, date, awarder, summary)
-- Reference (name, relationship, email, phone, summary)
-
-**Content:**
-- Quote (text, attribution)
-- CodeBlock (code, language)
-- Hyperlink (text, url)
-- PageBreak
-- Header (text)
-- Footer (text)
-- Metadata (key-value pairs)
-
-#### Dual-Syntax API
-
-Every component supports both shorthand and object syntax:
-```ts
-Heading("Experience")
-Heading({ text: "Experience", id: "exp", level: 2 })
-```
-
-#### Visitor Pattern
-
-```ts
-visit(document, {
-  Heading(node) { ... },
-  Paragraph(node) { ... }
-});
-```
-
-#### Error System
-
-- DocScriptError (base)
-- ValidationError
-- ParserError
-- RegistryError
-
-#### Enhanced Registry
-
-- ComponentMeta (kind, version, description, props spec, allowed children)
-- getMeta(), kinds() methods
-
-#### Component Hierarchy Rules
-
-- Document → any (root only)
-- Section → content + professional components
-- Columns → block-level only
-- List → Paragraph only
-- Leaf nodes: Heading, Paragraph, Image, Quote, CodeBlock, Hyperlink
-
-#### Enhanced Validation (15+ rules)
-
-- Unknown component kinds
-- Unknown props
-- Missing required props
-- Illegal parent-child
-- Singleton violations (Metadata)
-- Per-component required props
-
-#### Documentation
-
-- `docs/specification.md` — full language spec
-- TSDoc on all public APIs
-- 4 examples: resume, report, invoice, cover letter
-
-### Files to Modify/Create
-
-| Package | Modified | Created |
-|---|---|---|
-| @docscript/types | 4 files | 2 (errors.ts, visitor.ts) |
-| @docscript/core | 11 files | 19 (17 components + visitor + registry) |
-| @docscript/validator | 3 files | 1 (hierarchy.ts) |
-| tests/ | 2 files | 4 new test files |
-| examples/ | 0 | 4 new examples |
-| docs/ | 0 | 1 (specification.md) |
 
 ---
 
 ## Future Roadmap
 
-- [ ] v0.2 — Language Design & Component Specification
 - [ ] v0.3 — DOCX Renderer Implementation
 - [ ] v0.4 — Rich Text Support (bold, italic, links)
 - [ ] v0.5 — Table Cell Content

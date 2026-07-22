@@ -1,19 +1,19 @@
-import type { TableNode, DSNode } from "@docscript/types";
+import type { HeaderNode, DSNode } from "@docscript/types";
 import { DS_NODE_VERSION } from "@docscript/types";
 
 function isDSNode(value: unknown): value is DSNode {
   return typeof value === "object" && value !== null && "kind" in value;
 }
 
-export function Table(...children: DSNode[]): TableNode;
-export function Table(props: { id?: string }, ...children: DSNode[]): TableNode;
-export function Table(
+export function Header(...children: DSNode[]): HeaderNode;
+export function Header(props: { id?: string }, ...children: DSNode[]): HeaderNode;
+export function Header(
   first: DSNode | { id?: string },
   ...rest: DSNode[]
-): TableNode {
+): HeaderNode {
   if (isDSNode(first)) {
-    const node: TableNode = {
-      kind: "table",
+    const node: HeaderNode = {
+      kind: "header",
       version: DS_NODE_VERSION,
       props: {},
       children: Object.freeze([first, ...rest]),
@@ -21,8 +21,8 @@ export function Table(
     return Object.freeze(node);
   }
 
-  const node: TableNode = {
-    kind: "table",
+  const node: HeaderNode = {
+    kind: "header",
     version: DS_NODE_VERSION,
     props: { ...first },
     children: Object.freeze([...rest]),

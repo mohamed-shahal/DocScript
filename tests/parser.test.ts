@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Document, Heading, Paragraph } from "@docscript/core";
+import { Document, Heading, Paragraph, Text, Section } from "@docscript/core";
 import { parse, normalize } from "@docscript/parser";
 
 describe("normalize", () => {
@@ -14,7 +14,7 @@ describe("normalize", () => {
   it("normalizes nested nodes", () => {
     const doc = Document(
       Heading("Title"),
-      Paragraph("Body"),
+      Paragraph(Text("Body")),
     );
     const normalized = normalize(doc);
 
@@ -22,6 +22,15 @@ describe("normalize", () => {
     for (const child of normalized.children) {
       expect(Object.isFrozen(child)).toBe(true);
     }
+  });
+
+  it("preserves node structure", () => {
+    const doc = Document(Section(Heading("X")));
+    const normalized = normalize(doc);
+
+    expect(normalized.kind).toBe("document");
+    expect(normalized.children[0].kind).toBe("section");
+    expect(normalized.children[0].children[0].kind).toBe("heading");
   });
 });
 
