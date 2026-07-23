@@ -1,10 +1,21 @@
 {
-  "files": [],
-  "references": [
-    { "path": "packages/types" },
-    { "path": "packages/core" },
-    { "path": "packages/parser" },
-    { "path": "packages/validator" },
-    { "path": "packages/renderer-docx" }
-  ]
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022"],
+    "outDir": "./packages/main/dist",
+    "rootDir": "./packages/main/src",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true
+  },
+  "include": ["packages/main/src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }

@@ -1,118 +1,253 @@
 # DocScript
 
-> Component-based JavaScript framework for building editable Microsoft Word documents.
+A TypeScript library for creating professional Microsoft Word resumes using semantic components.
 
-## Vision
+## Install
 
-DocScript sits on top of the existing `docx` library and provides a simpler, semantic, component-based API. Think of it as React for Word documents.
-
-Instead of writing:
-
-```ts
-new Paragraph({
-  children: [
-    new TextRun("Hello")
-  ]
-})
+```bash
+npm install docscript
+# or
+pnpm add docscript
 ```
-
-Developers write:
-
-```ts
-Paragraph("Hello")
-```
-
-## Why DocScript
-
-- **Semantic**: Components describe document meaning, not formatting
-- **Component-based**: Compose documents from reusable building blocks
-- **Type-safe**: Full TypeScript support with strict typing
-- **Immutable**: All nodes are frozen, preventing accidental mutation
-- **Extensible**: Register custom components via the plugin registry
-
-## Architecture
-
-```
-docscript/
-  packages/
-    core/            - Component factories and registry
-    types/           - Shared TypeScript types
-    parser/          - Node normalization and parsing
-    validator/       - Modular validation rules
-    renderer-docx/   - DOCX rendering (placeholder)
-  examples/          - Usage examples
-  tests/             - Integration tests
-```
-
-## Packages
-
-| Package | Description |
-|---------|-------------|
-| `@docscript/types` | Shared TypeScript interfaces and type definitions |
-| `@docscript/core` | Component factories (Document, Heading, Paragraph, etc.) and registry |
-| `@docscript/parser` | Node normalization and parsing pipeline |
-| `@docscript/validator` | Modular validation system with structured errors |
-| `@docscript/renderer-docx` | DOCX rendering (not yet implemented) |
 
 ## Quick Start
 
 ```ts
-import { Document, Heading, Paragraph } from "@docscript/core";
+import { Packer } from "docx";
+import {
+  Resume,
+  Header,
+  Name,
+  Designation,
+  Contact,
+  Summary,
+  Experience,
+  ExperienceItem,
+  Skills,
+  Skill,
+  Education,
+  EducationItem,
+} from "docscript";
 
-const doc = Document(
-  Heading("My Document"),
-  Paragraph("Hello, world!")
+const resume = Resume(
+  Header(
+    Name("John Doe"),
+    Designation("Software Engineer"),
+    Contact({
+      email: "john@example.com",
+      phone: "+91xxxxxxxxxx",
+    })
+  ),
+
+  Summary(
+    "Passionate software engineer with experience building scalable applications."
+  ),
+
+  Experience(
+    ExperienceItem({
+      company: "ABC Technologies",
+      designation: "Frontend Developer",
+      duration: "2023 - Present",
+      points: [
+        "Developed React applications",
+        "Improved application performance",
+      ],
+    })
+  ),
+
+  Skills(
+    Skill("TypeScript"),
+    Skill("React"),
+    Skill("Node.js")
+  ),
+
+  Education(
+    EducationItem({
+      degree: "B.Tech Computer Science",
+      institution: "XYZ University",
+      year: "2023",
+    })
+  )
+);
+
+const buffer = await Packer.toBuffer(resume);
+```
+
+## Components
+
+### Root
+
+| Component | Description |
+|-----------|-------------|
+| `Resume(...sections)` | Assembles all sections into a `docx.Document` |
+
+### Generic
+
+| Component | Description |
+|-----------|-------------|
+| `Heading(text)` | Large heading paragraph |
+| `SubHeading(text)` | Sub-heading paragraph |
+| `SectionHeading(text)` | Section heading with accent color |
+| `Text(text)` | Normal text paragraph |
+| `SmallText(text)` | Small secondary text |
+| `Bullet(text)` | Single bullet point |
+| `BulletList(items)` | Multiple bullet points |
+| `Divider()` | Horizontal divider line |
+| `Spacer(points?)` | Vertical spacing |
+
+### Header
+
+| Component | Description |
+|-----------|-------------|
+| `Header(...children)` | Container for header content |
+| `Name(text)` | Candidate name (large, centered) |
+| `Designation(text)` | Professional title |
+| `Contact(info)` | Contact line with pipe separators |
+| `Address(text)` | Address in small text |
+| `Photo(config)` | Photo image |
+
+### Profile
+
+| Component | Description |
+|-----------|-------------|
+| `Summary(text)` | Professional summary |
+| `Objective(text)` | Career objective |
+
+### Experience
+
+| Component | Description |
+|-----------|-------------|
+| `Experience(...items)` | Container for experience entries |
+| `ExperienceItem(config)` | Entry with company, designation, duration, points |
+| `Company(name)` | Company name standalone |
+| `Duration(text)` | Duration standalone |
+
+### Education
+
+| Component | Description |
+|-----------|-------------|
+| `Education(...items)` | Container for education entries |
+| `EducationItem(config)` | Entry with degree, institution, year |
+| `Institution(name)` | Institution name standalone |
+| `Degree(name)` | Degree name standalone |
+
+### Skills
+
+| Component | Description |
+|-----------|-------------|
+| `Skills(...items)` | Container for skills |
+| `Skill(name)` | Single skill item |
+
+### Projects
+
+| Component | Description |
+|-----------|-------------|
+| `Projects(...items)` | Container for projects |
+| `Project(config)` | Entry with name, description, points |
+
+### Certifications
+
+| Component | Description |
+|-----------|-------------|
+| `Certifications(...items)` | Container for certifications |
+| `Certification(config)` | Entry with name, issuer, date |
+
+### Languages
+
+| Component | Description |
+|-----------|-------------|
+| `Languages(...items)` | Container for languages |
+| `Language(config)` | Entry with name, proficiency |
+
+### Awards
+
+| Component | Description |
+|-----------|-------------|
+| `Awards(...items)` | Container for awards |
+| `Award(config)` | Entry with title, date, issuer |
+
+### References
+
+| Component | Description |
+|-----------|-------------|
+| `References(...items)` | Container for references |
+| `Reference(config)` | Entry with name, title, company, email, phone |
+
+## Styling
+
+All typography is centralized in a style system. Override any token via `createStyles`:
+
+```ts
+import { createStyles, Resume, Header, Name } from "docscript";
+
+const customStyles = createStyles({
+  heading: { color: "FF0000", size: 32 },
+  name: { font: "Georgia" },
+});
+
+const resume = Resume(
+  Header(Name("John Doe", customStyles)),
+  // ...
 );
 ```
 
+### Style Tokens
+
+| Token | Used By |
+|-------|---------|
+| `heading` | `Heading` |
+| `subHeading` | `SubHeading` |
+| `sectionHeading` | `SectionHeading` |
+| `name` | `Name` |
+| `designation` | `Designation`, `ExperienceItem`, `EducationItem` |
+| `text` | `Text`, `Summary`, `Objective` |
+| `smallText` | `SmallText`, `Address` |
+| `bullet` | `Bullet`, `BulletList` |
+| `company` | `Company`, `Institution`, `Skill`, `Project`, `Certification`, `Language`, `Award` |
+| `duration` | `Duration`, experience/education/certification/award dates |
+| `contact` | `Contact` |
+| `skill` | `Skill` |
+
+## Project Structure
+
+```
+packages/main/src/
+├── types/index.ts          # TypeScript interfaces
+├── styles/index.ts         # Centralized style tokens
+├── core/index.ts           # Docx primitives
+├── utils/index.ts          # Utility helpers
+├── components/
+│   ├── generic.ts          # Heading, Text, Bullet, Divider, Spacer, etc.
+│   ├── header.ts           # Header, Name, Designation, Contact, etc.
+│   ├── profile.ts          # Summary, Objective
+│   ├── experience.ts       # Experience, ExperienceItem
+│   ├── education.ts        # Education, EducationItem
+│   ├── skills.ts           # Skills, Skill
+│   ├── projects.ts         # Projects, Project
+│   ├── certifications.ts   # Certifications, Certification
+│   ├── languages.ts        # Languages, Language
+│   ├── awards.ts           # Awards, Award
+│   ├── references.ts       # References, Reference
+│   └── resume.ts           # Resume root component
+├── components.test.ts      # Tests
+└── index.ts                # Public exports
+```
+
 ## Development
-
-### Prerequisites
-
-- Node.js >= 18
-- pnpm >= 9
-
-### Setup
 
 ```bash
 # Install dependencies
 pnpm install
 
-# Build all packages
-pnpm build
-
 # Run tests
 pnpm test
 
-# Lint
+# Type check
 pnpm lint
 
-# Type check
-pnpm typecheck
+# Build
+pnpm build
 ```
-
-### Project Structure
-
-This is a pnpm monorepo. Each package in `packages/` is independently versioned and published.
-
-## Roadmap
-
-- [ ] DOCX renderer implementation
-- [ ] Rich text support (bold, italic, links)
-- [ ] Table cell content support
-- [ ] Page layout configuration
-- [ ] Style system
-- [ ] Plugin API for custom renderers
-- [ ] CLI tool for document generation
-- [ ] VS Code extension
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
 
 ## License
 
