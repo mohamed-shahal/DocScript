@@ -1,13 +1,13 @@
-# DocScript
+# DocLang
 
 A TypeScript library for creating professional Microsoft Word resumes using semantic components.
 
 ## Install
 
 ```bash
-npm install docscript
+npm install doclang
 # or
-pnpm add docscript
+pnpm add doclang
 ```
 
 ## Quick Start
@@ -27,7 +27,7 @@ import {
   Skill,
   Education,
   EducationItem,
-} from "docscript";
+} from "doclang";
 
 const resume = Resume(
   Header(
@@ -178,7 +178,7 @@ const buffer = await Packer.toBuffer(resume);
 All typography is centralized in a style system. Override any token via `createStyles`:
 
 ```ts
-import { createStyles, Resume, Header, Name } from "docscript";
+import { createStyles, Resume, Header, Name } from "doclang";
 
 const customStyles = createStyles({
   heading: { color: "FF0000", size: 32 },

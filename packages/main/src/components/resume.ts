@@ -15,7 +15,7 @@ import {
  * @example
  * ```ts
  * import { Packer } from "docx";
- * import { Resume, Header, Name } from "docscript";
+ * import { Resume, Header, Name } from "doclang";
  *
  * const doc = Resume(Header(Name("John Doe")));
  * const buffer = await Packer.toBuffer(doc);

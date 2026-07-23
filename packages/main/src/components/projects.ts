@@ -15,7 +15,7 @@ import { paragraphFromToken, inlineParagraph, textRunFromToken, getStyles, Parag
  * ```ts
  * const projects = Projects(
  *   Project({
- *     name: "DocScript",
+ *     name: "DocLang",
  *     description: "Resume builder library",
  *     points: ["Built with TypeScript", "Uses docx package"]
  *   })
