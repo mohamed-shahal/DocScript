@@ -4,6 +4,7 @@
   "description": "A TypeScript library for creating professional resumes using semantic components",
   "type": "module",
   "main": "./packages/main/dist/index.js",
+  "browser": "./packages/main/dist/doclang.min.js",
   "types": "./packages/main/dist/index.d.ts",
   "exports": {
     ".": {
@@ -16,6 +17,8 @@
   ],
   "scripts": {
     "build": "tsc",
+    "build:browser": "esbuild packages/main/src/browser.ts --bundle --minify --outfile=packages/main/dist/doclang.min.js --global-name=DocLang --format=iife",
+    "build:all": "npm run build && npm run build:browser",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "tsc --noEmit"
@@ -32,6 +35,7 @@
     "docx": "^9.1.0"
   },
   "devDependencies": {
+    "esbuild": "^0.24.2",
     "typescript": "^5.7.0",
     "vitest": "^3.0.0"
   }

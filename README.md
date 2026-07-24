@@ -10,10 +10,116 @@ npm install doclang
 pnpm add doclang
 ```
 
+## CDN Usage
+
+### Option 1: Using a Bundled Version (Recommended for Browsers)
+
+First, build the browser bundle:
+
+```bash
+npm run build:browser
+```
+
+This creates `packages/main/dist/doclang.min.js` which you can include in your HTML:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resume Generator</title>
+</head>
+<body>
+    <button onclick="generateResume()">Generate Resume</button>
+    
+    <script src="./packages/main/dist/doclang.min.js"></script>
+    <script>
+        async function generateResume() {
+            const { Resume, Header, Name, Designation, Contact, Summary, Experience, ExperienceItem, Skills, Skill } = DocLang;
+            const { Packer } = DocLang.docx;
+            
+            const resume = Resume(
+                Header(
+                    Name("John Doe"),
+                    Designation("Software Engineer"),
+                    Contact({
+                        email: "john@example.com",
+                        phone: "+1 234 567 890"
+                    })
+                ),
+                Summary("Passionate software engineer with experience building scalable applications."),
+                Experience(
+                    ExperienceItem({
+                        company: "ABC Technologies",
+                        designation: "Frontend Developer",
+                        duration: "2023 - Present",
+                        points: ["Developed React applications", "Improved performance"]
+                    })
+                ),
+                Skills(
+                    Skill("TypeScript"),
+                    Skill("React"),
+                    Skill("Node.js")
+                )
+            );
+            
+            const buffer = await Packer.toBuffer(resume);
+            const blob = new Blob([buffer], { 
+                type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
+            });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'resume.docx';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
+```
+
+### Option 2: Using ES Modules via CDN
+
+You can use the library directly via ES modules with import maps:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resume Generator</title>
+    <script type="importmap">
+    {
+        "imports": {
+            "doclang": "https://unpkg.com/doclang@latest/dist/index.js",
+            "docx": "https://unpkg.com/docx@latest/build/index.js"
+        }
+    }
+    </script>
+</head>
+<body>
+    <script type="module">
+        import { Resume, Header, Name, Designation, Contact, Summary, Experience, ExperienceItem, Skills, Skill } from 'doclang';
+        import { Packer } from 'docx';
+        
+        // ... rest of the code
+    </script>
+</body>
+</html>
+```
+
+**Note:** For Option 2, the library must be published to npm first, and the URLs need to point to a CDN that supports ES modules.
+
+### Option 3: Using a CDN Service
+
+After publishing to npm, you can use services like:
+
+- **unpkg**: `https://unpkg.com/doclang@latest/dist/doclang.min.js`
+- **jsDelivr**: `https://cdn.jsdelivr.net/npm/doclang@latest/dist/doclang.min.js`
+- **esm.sh**: `https://esm.sh/doclang` (for ES modules)
+
 ## Quick Start
 
 ```ts
-import { Packer } from "docx";
 import {
   Resume,
   Header,
@@ -27,6 +133,7 @@ import {
   Skill,
   Education,
   EducationItem,
+  exportFile,
 } from "doclang";
 
 const resume = Resume(
@@ -70,7 +177,11 @@ const resume = Resume(
   )
 );
 
-const buffer = await Packer.toBuffer(resume);
+// Save as DOCX
+await exportFile(resume, { fileName: "john_doe" });
+
+// Save as DOCX + PDF (requires LibreOffice)
+await exportFile(resume, { fileName: "john_doe", pdf: true });
 ```
 
 ## Components

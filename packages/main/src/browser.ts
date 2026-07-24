@@ -1,3 +1,4 @@
+// Browser-compatible exports (no Node.js-specific utilities)
 export { defaultStyles, createStyles } from "./styles/index.js";
 
 export type { ResumeStyles, StyleToken } from "./types/index.js";
@@ -12,8 +13,6 @@ export {
 } from "./core/index.js";
 
 export { formatContact, normalizeList, sectionId } from "./utils/index.js";
-export { exportFile } from "./utils/export.js";
-export type { ExportOptions, ExportResult } from "./utils/export.js";
 
 // Generic
 export {
